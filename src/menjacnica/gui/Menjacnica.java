@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -16,9 +17,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import menjacnica.Valuta;
 import menjacnica.Zemlja;
 import menjacnica.util.URLConnectionUtil;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.awt.event.ActionEvent;
 
 public class Menjacnica extends JFrame {
 
@@ -91,6 +97,47 @@ public class Menjacnica extends JFrame {
 	private JButton getBtnKonvertuj() {
 		if (btnKonvertuj == null) {
 			btnKonvertuj = new JButton("Konvertuj");
+			btnKonvertuj.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					Zemlja zemljaIz = (Zemlja) comboBoxIzZemlje.getSelectedItem();
+					Zemlja zemljaU = (Zemlja) comboBoxUZemlju.getSelectedItem();
+					String q = zemljaIz.getCurrencyId() + "_" + zemljaU.getCurrencyId();
+
+					try {
+						String content = URLConnectionUtil
+								.getContent("http://free.currencyconverterapi.com/api/v3/convert?q=" + q);
+
+						Gson gson = new GsonBuilder().create();
+						JsonObject jsonObject = gson.fromJson(content, JsonObject.class);
+						JsonObject konverzija = jsonObject.get("results").getAsJsonObject();
+						Valuta item = null;
+
+						for (Entry<String, JsonElement> entry : konverzija.entrySet()) {
+							item = gson.fromJson(entry.getValue().getAsJsonObject(), Valuta.class);
+						}
+
+						if (item == null) {
+							JOptionPane j = new JOptionPane();
+							j.showMessageDialog(j, "Ne moze se izvrsiti trazena konverzija.", "Greska!",
+									j.ERROR_MESSAGE);
+						} else {
+							if (textFieldIznos1.getText().equals("")) {
+								JOptionPane j = new JOptionPane();
+								j.showMessageDialog(j, "Unesite iznos!", "Greska!", j.ERROR_MESSAGE);
+							} else {
+								double iznos = Double.parseDouble(textFieldIznos1.getText());
+								textFieldIznos2.setText(Double.toString(item.getVal() * iznos));
+							}
+
+						}
+
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			});
 			btnKonvertuj.setBounds(163, 200, 97, 25);
 		}
 		return btnKonvertuj;

@@ -1,0 +1,48 @@
+package menjacnica;
+
+public class Valuta {
+
+	String fr;
+	String id;
+	String to;
+	double val;
+
+	public String getFr() {
+		return fr;
+	}
+
+	public void setFr(String fr) {
+		this.fr = fr;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getTo() {
+		return to;
+	}
+
+	public void setTo(String to) {
+		this.to = to;
+	}
+
+	public double getVal() {
+		return val;
+	}
+
+	public void setVal(double val) {
+		this.val = val;
+	}
+
+	@Override
+	public String toString() {
+		return "Konverzija [fr=" + fr + ", id=" + id + ", to=" + to + ", val=" + val + "]";
+	}
+	
+
+}
