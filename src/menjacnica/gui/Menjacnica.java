@@ -1,6 +1,7 @@
 package menjacnica.gui;
 
 import java.awt.EventQueue;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
@@ -19,11 +20,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import menjacnica.Konverzija;
 import menjacnica.Valuta;
 import menjacnica.Zemlja;
 import menjacnica.util.URLConnectionUtil;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.awt.event.ActionEvent;
 
 public class Menjacnica extends JFrame {
@@ -127,6 +131,7 @@ public class Menjacnica extends JFrame {
 							} else {
 								double iznos = Double.parseDouble(textFieldIznos1.getText());
 								textFieldIznos2.setText(Double.toString(item.getVal() * iznos));
+								sacuvaKonverziju(item.getFr(), item.getTo(), item.getVal());
 							}
 
 						}
@@ -222,5 +227,29 @@ public class Menjacnica extends JFrame {
 			// TODO: handle exception
 		}
 		return null;
+	}
+
+	private void sacuvaKonverziju(String izValuta, String uValuta, double kurs) {
+		Date datumVreme = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+		String sDate = sdf.format(datumVreme);
+
+		Konverzija k = new Konverzija();
+		k.setDatumVreme(sDate);
+		k.setIzValuta(izValuta);
+		k.setuValuta(uValuta);
+		k.setKurs(kurs);
+
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		FileWriter writer;
+		try {
+			writer = new FileWriter("log.json", true);
+			writer.write(gson.toJson(k));
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

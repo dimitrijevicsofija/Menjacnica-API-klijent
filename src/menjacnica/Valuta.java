@@ -2,10 +2,10 @@ package menjacnica;
 
 public class Valuta {
 
-	String fr;
-	String id;
-	String to;
-	double val;
+	private String fr;
+	private String id;
+	private String to;
+	private double val;
 
 	public String getFr() {
 		return fr;
