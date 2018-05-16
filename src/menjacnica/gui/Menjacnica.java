@@ -1,6 +1,7 @@
 package menjacnica.gui;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -23,6 +24,8 @@ import com.google.gson.JsonParser;
 import menjacnica.Konverzija;
 import menjacnica.Valuta;
 import menjacnica.Zemlja;
+import menjacnica.gui.kontroler.GUIKontroler;
+import menjacnica.sistemskeoperacije.SOGetZemlje;
 import menjacnica.util.URLConnectionUtil;
 import java.awt.event.ActionListener;
 import java.io.FileWriter;
@@ -42,22 +45,6 @@ public class Menjacnica extends JFrame {
 	private JLabel lblIznos2;
 	private JTextField textFieldIznos1;
 	private JTextField textFieldIznos2;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Menjacnica frame = new Menjacnica();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -103,44 +90,8 @@ public class Menjacnica extends JFrame {
 			btnKonvertuj = new JButton("Konvertuj");
 			btnKonvertuj.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					Zemlja zemljaIz = (Zemlja) comboBoxIzZemlje.getSelectedItem();
-					Zemlja zemljaU = (Zemlja) comboBoxUZemlju.getSelectedItem();
-					String q = zemljaIz.getCurrencyId() + "_" + zemljaU.getCurrencyId();
-
-					try {
-						String content = URLConnectionUtil
-								.getContent("http://free.currencyconverterapi.com/api/v3/convert?q=" + q);
-
-						Gson gson = new GsonBuilder().create();
-						JsonObject jsonObject = gson.fromJson(content, JsonObject.class);
-						JsonObject konverzija = jsonObject.get("results").getAsJsonObject();
-						Valuta item = null;
-
-						for (Entry<String, JsonElement> entry : konverzija.entrySet()) {
-							item = gson.fromJson(entry.getValue().getAsJsonObject(), Valuta.class);
-						}
-
-						if (item == null) {
-							JOptionPane j = new JOptionPane();
-							j.showMessageDialog(j, "Ne moze se izvrsiti trazena konverzija.", "Greska!",
-									j.ERROR_MESSAGE);
-						} else {
-							if (textFieldIznos1.getText().equals("")) {
-								JOptionPane j = new JOptionPane();
-								j.showMessageDialog(j, "Unesite iznos!", "Greska!", j.ERROR_MESSAGE);
-							} else {
-								double iznos = Double.parseDouble(textFieldIznos1.getText());
-								textFieldIznos2.setText(Double.toString(item.getVal() * iznos));
-								sacuvaKonverziju(item.getFr(), item.getTo(), item.getVal());
-							}
-
-						}
-
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+					GUIKontroler.konvertuj((Zemlja) comboBoxIzZemlje.getSelectedItem(),
+							(Zemlja) comboBoxUZemlju.getSelectedItem(), textFieldIznos1, textFieldIznos2);
 				}
 			});
 			btnKonvertuj.setBounds(163, 200, 97, 25);
@@ -153,7 +104,7 @@ public class Menjacnica extends JFrame {
 			comboBoxIzZemlje = new JComboBox();
 			comboBoxIzZemlje.setBounds(47, 101, 118, 22);
 
-			LinkedList<Zemlja> zemlje = getZemlje();
+			LinkedList<Zemlja> zemlje = SOGetZemlje.izvrsi();
 			for (int i = 0; i < zemlje.size(); i++) {
 				comboBoxIzZemlje.addItem(zemlje.get(i));
 			}
@@ -166,7 +117,7 @@ public class Menjacnica extends JFrame {
 			comboBoxUZemlju = new JComboBox();
 			comboBoxUZemlju.setBounds(277, 101, 118, 22);
 
-			LinkedList<Zemlja> zemlje = getZemlje();
+			LinkedList<Zemlja> zemlje = SOGetZemlje.izvrsi();
 			for (int i = 0; i < zemlje.size(); i++) {
 				comboBoxUZemlju.addItem(zemlje.get(i));
 			}
@@ -207,49 +158,5 @@ public class Menjacnica extends JFrame {
 			textFieldIznos2.setColumns(10);
 		}
 		return textFieldIznos2;
-	}
-
-	private LinkedList<Zemlja> getZemlje() {
-		try {
-			String content = URLConnectionUtil.getContent("http://free.currencyconverterapi.com/api/v3/countries");
-			Gson gson = new GsonBuilder().create();
-			JsonObject jsonObject = gson.fromJson(content, JsonObject.class);
-			JsonObject zemljeJson = jsonObject.get("results").getAsJsonObject();
-
-			LinkedList<Zemlja> zemlje = new LinkedList<>();
-			for (Entry<String, JsonElement> entry : zemljeJson.entrySet()) {
-				Zemlja item = gson.fromJson(entry.getValue().getAsJsonObject(), Zemlja.class);
-				zemlje.add(item);
-			}
-
-			return zemlje;
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return null;
-	}
-
-	private void sacuvaKonverziju(String izValuta, String uValuta, double kurs) {
-		Date datumVreme = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
-		String sDate = sdf.format(datumVreme);
-
-		Konverzija k = new Konverzija();
-		k.setDatumVreme(sDate);
-		k.setIzValuta(izValuta);
-		k.setuValuta(uValuta);
-		k.setKurs(kurs);
-
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		FileWriter writer;
-		try {
-			writer = new FileWriter("log.json", true);
-			writer.write(gson.toJson(k));
-			writer.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+	}	
 }

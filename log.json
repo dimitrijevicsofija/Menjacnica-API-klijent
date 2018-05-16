@@ -23,4 +23,34 @@
   "izValuta": "AFN",
   "uValuta": "BRL",
   "kurs": 0.050512
+}{
+  "datumVreme": "2018-05-16 15:45:40.000209",
+  "izValuta": "AUD",
+  "uValuta": "AFN",
+  "kurs": 53.392223
+}{
+  "datumVreme": "2018-05-16 15:55:40.000847",
+  "izValuta": "AFN",
+  "uValuta": "AFN",
+  "kurs": 1.0
+}{
+  "datumVreme": "2018-05-16 16:05:20.000572",
+  "izValuta": "AFN",
+  "uValuta": "AFN",
+  "kurs": 1.0
+}{
+  "datumVreme": "2018-05-16 16:16:48.000964",
+  "izValuta": "AFN",
+  "uValuta": "AFN",
+  "kurs": 1.0
+}{
+  "datumVreme": "2018-05-16 16:16:51.000500",
+  "izValuta": "XCD",
+  "uValuta": "AFN",
+  "kurs": 26.344187
+}{
+  "datumVreme": "2018-05-16 16:16:53.000475",
+  "izValuta": "XOF",
+  "uValuta": "AFN",
+  "kurs": 0.128069
 }
