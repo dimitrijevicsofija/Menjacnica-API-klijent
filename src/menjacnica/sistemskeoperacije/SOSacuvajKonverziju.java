@@ -47,7 +47,7 @@ public class SOSacuvajKonverziju {
 				istorijaKonverzija = new JsonArray();
 			istorijaKonverzija.add(jsonk);
 
-			writer = new FileWriter("log.json", true);
+			writer = new FileWriter("log.json");
 			writer.write(gson.toJson(istorijaKonverzija));
 			writer.close();
 		} catch (IOException e) {
